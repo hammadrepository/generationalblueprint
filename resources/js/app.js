@@ -15,12 +15,10 @@ window.Form = Form;
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
 
+//
 
 //moment js
 import moment from "moment";
-
-
-
 
 import VueProgressBar from 'vue-progressbar'
 
@@ -71,8 +69,42 @@ Vue.filter('mydate',function (created) {
    return moment(created).format('MMM Do YY');
 });
 
+import Toast from "vue-toastification";
+// Import the CSS or use your own!
+import "vue-toastification/dist/index.css";
+
+const options = {
+    // You can set your default options here
+};
+Vue.use(Toast, options);
 
 Vue.prototype.$userId = document.querySelector("meta[name='user_id']").getAttribute('content');
+
+Echo.private('groups')
+    .listen('NewMessage', (e) => {
+
+        if(Vue.prototype.$userId != e.user.id){
+        var message = e.type == "media" ? "File Received" :e.message;
+        var title = `${e.group.name}`;
+        Vue.$toast(title + '\n' + e.user.name +': ' + message , {
+            position: "bottom-left",
+            timeout: 5000,
+            closeOnClick: false,
+            pauseOnFocusLoss: false,
+            pauseOnHover: false,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: e.type == 'media' ? "fas fa-file" : "fas fa-comments",
+            rtl: false
+        });
+
+        }
+    });
+
+
 const app = new Vue({
     el: '#app',
     vuetify: new Vuetify(),

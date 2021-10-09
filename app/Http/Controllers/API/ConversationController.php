@@ -11,15 +11,14 @@ class ConversationController extends Controller
 {
     public function store()
     {
-
         try{
             $conversation = Conversation::create([
                 'message' => request('message'),
                 'group_id' => request('group_id'),
-                'user_id' => auth('sanctum')->user()->id,
+                'user_id' => request('user_id'),
             ]);
 
-            event(new NewMessage($conversation))->toOthers();
+            event(new NewMessage($conversation))->dontBroadcastToCurrentUser();
 
             return response()->json($conversation->load('user'));
         }catch(\Throwable $e){
@@ -29,4 +28,5 @@ class ConversationController extends Controller
             }
         }
     }
+
 }

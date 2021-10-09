@@ -35,12 +35,16 @@ class NewMessage implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('groups.' . $this->conversation->group->id);
+        return [
+            new PrivateChannel('groups.' . $this->conversation->group->id),
+            new PrivateChannel('groups',$this->conversation->group),
+        ];
     }
 
     public function broadcastWith()
     {
         return [
+            'group' => $this->conversation->group,
             'type' => $this->conversation->type ?? '',
             'message' => $this->conversation->message,
             'created_at' => date_format($this->conversation->created_at,"Y-m-d H:i"),

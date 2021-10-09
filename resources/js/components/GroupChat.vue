@@ -61,9 +61,9 @@
                                         <div v-show="getClass(conversation.user.id) != 'chat-right'" class="chat-hour">{{ conversation.created_at.split(' ')[1]}} <span class="fa fa-check-circle"></span></div>
                                     </li>
                                 </ul>
-                                <div class="form-group mt-3 mb-0">
+                                <div v-show="this.user1.status" class="form-group mt-3 mb-0">
                                     <div class="input-group">
-                                        <input id="btn-input" v-model="message" autofocus class="form-control input-sm" placeholder="Type your message here..." type="text" @keyup.enter="store()" />
+                                        <input id="btn-input" v-model="message" @keyup="keyPressed($event.target.value)" autofocus class="form-control input-sm" placeholder="Type your message here..." type="text" @keyup.enter="store()" />
 
                                         <div class='file file--upload'>
                                             <label for='input-file'>
@@ -72,11 +72,15 @@
                                             <input id='input-file' type='file' @change="sendMediaMessage" />
                                         </div>
                                         <span class="input-group-btn">
-                            <button id="btn-chat" class="btn btn-warning btn-md" @click.prevent="store()">
+                            <button id="btn-chat" :disabled="isDisabled" class="btn btn-warning btn-md" @click.prevent="store()">
                                 Send  <span v-if="loading" aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span></button>
-                        </span>
+                                </span>
                                     </div>
                                 </div>
+                                <div v-show="!this.user1.status" class="form-group mt-3 mb-0">
+                                    <p class="text-danger text-center font-weight-bold"> You are banned from this group! </p>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -125,7 +129,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button v-show="isAdmin" type="submit" class="btn btn-danger">Ban User</button>
+                            <button v-show="isAdmin" @click.prevent="banUser(form.id)" type="submit" class="btn btn-danger"><span v-show="form.status">Ban User</span> <span v-show="!form.status">Unban User</span> </button>
                         </div>
                     </form>
                 </div>
@@ -145,11 +149,13 @@
                 conversations: [],
                 message: '',
                 group_id: this.group.id,
+                currentGroup : {},
                 loading : false,
                 next_page_url:'',
                 hasMore : false,
                 overlay: false,
                 isLoaded : false,
+                isDisabled : true,
                 isLoading: false,
                 btnLoading: false,
                 selected: undefined,
@@ -160,9 +166,11 @@
                 groupName:'',
                 isAdmin: false,
                 form : new Form({
+                    id: '',
                     name : '',
                     email : '',
                     phone : '',
+                    status: '',
                 }),
             }
         },
@@ -170,19 +178,20 @@
         mounted() {
             this.user1 = this.user;
             this.groups = this.allgroups;
+            this.currentGroup = this.groups[0];
             this.loadChat(this.allgroups[0].id);
             this.listenForNewMessage();
         },
-        watch: {
-            loader () {
-                const l = this.loader
-                this[l] = !this[l]
-
-                setTimeout(() => (this[l] = false), 3000)
-
-                this.loader = null
-            },
-        },
+        // watch: {
+        //     loader () {
+        //         const l = this.loader
+        //         this[l] = !this[l]
+        //
+        //         setTimeout(() => (this[l] = false), 3000)
+        //
+        //         this.loader = null
+        //     },
+        // },
 
         methods: {
             getIcon(extension){
@@ -204,21 +213,36 @@
                 return 'chat-left';
             },
             store() {
+
                 this.loading = true;
-                axios.post('/conversations', {message: this.message, group_id: this.group.id})
+                let config = {
+                    headers: {
+                        "X-Socket-Id": Echo.socketId(),
+                    }
+                }
+                axios.post('/conversations', {message: this.message, group_id: this.currentGroup.id},config)
                 .then((response) => {
                     this.message = '';
                     // this.conversations.push(response.data);
                     this.loading = false;
+                    this.isDisabled = true;
                     // this.scrollToEnd();
                 })
                 .catch((error) => {
                     this.message = '';
                     this.loading = false;
                     // this.conversations.push(response.data);
+                    this.isDisabled = true;
                     this.scrollToEnd();
                 });
 
+            },
+            keyPressed(e){
+                if(e.length > 0){
+                    this.isDisabled = false;
+                }else{
+                this.isDisabled = true;
+                }
             },
             sendMediaMessage({ target }) {
                 this.overlay = true;
@@ -229,7 +253,7 @@
                 }
                 let data = new FormData();
                 data.append('file', target.files[0]);
-                data.append('group_id', this.group.id);
+                data.append('group_id', this.currentGroup.id);
                 data.append('type', 'media');
 
                 axios.post('/upload', data, config)
@@ -279,13 +303,26 @@
                 this.isLoading = true;
               axios.get('/chat/'+id )
               .then((response) => {
+                  if(response['data']['data']){
+                  Echo.leaveChannel('private-groups.'+this.currentGroup.id);
                  this.conversations = (response.data.data.reverse());
                  this.next_page_url = response.data.next_page_url;
                  this.next_page_url != null ? this.hasMore = true: this.hasMore = false;
                   this.groupName = response.data.data[0].group.name;
-
+                  this.currentGroup = response.data.data[0].group;
+                  this.listenForNewMessage();
                   this.isLoading = false;
                   this.selected = id;
+                  }else{
+                      Echo.leaveChannel('private-groups.'+this.currentGroup.id);
+                      this.conversations = {};
+                      this.groupName = response.data.name;
+                      this.currentGroup = response.data;
+                      this.listenForNewMessage();
+                      this.isLoading = false;
+                      this.hasMore = false;
+                      this.selected = id;
+                  }
               });
 
               this.isLoaded = true;
@@ -300,9 +337,27 @@
                         $('#addNew').modal('show');
                     });
             },
+            banUser(id){
+                this.isLoading = true;
+                axios.post('/api/banUser',{
+                    status: !this.form.status,
+                        id: id
+                })
+                    .then((response) => {
+                        console.log(response);
+                        $('#addNew').modal('hide');
+                    })
+                .catch((err) => {
+                    toast.fire({
+                        type: 'success',
+                        title: 'User Banned Successfully!'
+                    });
+                    $('#addNew').modal('hide');
+                });
+            },
             listenForNewMessage() {
 
-                Echo.private('groups.' + this.group.id)
+                Echo.private('groups.' + this.currentGroup.id)
                     .listen('NewMessage', (e) => {
                         // toast.fire({
                         //     type: 'success',
@@ -313,6 +368,15 @@
                             console.log('scrolling');
                             this.scrollToEnd();
                         },100);
+                    });
+
+                Echo.private('user.ban.' + this.user1.id)
+                    .listen('UserBan', (e) => {
+                        // toast.fire({
+                        //     type: 'success',
+                        //     title: e.message
+                        // });
+                        this.user1.status = this.user1.status == 1 ? 0 : 1  ;
                     });
 
             }

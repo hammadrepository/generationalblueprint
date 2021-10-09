@@ -20,20 +20,20 @@
             this.groups = this.initialGroups;
             this.user = this.currentUser;
 
-            Fire.$on('groupCreated', (group) => {
-                this.groups.push(group);
-            });
+            // Fire.$on('groupCreated', (group) => {
+            //     this.groups.push(group);
+            // });
 
-            this.listenForNewGroups();
+            // this.listenForNewGroups();
         },
 
         methods: {
-            listenForNewGroups() {
-                Echo.private('users.' + this.user.id)
-                    .listen('GroupCreated', (e) => {
-                        this.groups.push(e.group);
-                    });
-            }
+            // listenForNewGroups() {
+            //     Echo.private('users.' + this.user.id)
+            //         .listen('GroupCreated', (e) => {
+            //             this.groups.push(e.group);
+            //         });
+            // }
         }
     }
 </script>

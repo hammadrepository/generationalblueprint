@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Conversation;
+use App\Group;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+//        $this->middleware('auth');
 
     }
 
@@ -65,7 +66,15 @@ class HomeController extends Controller
     public function loadChat($id)
     {
         $chat = Conversation::where('group_id',$id)->orderBy('id', 'DESC')->orderBy('created_at', 'DESC')->paginate(10);
-        $chat->load('user','group');
+
+        if(count($chat) > 0){
+//            $chat->paginate(10);
+            $chat->load('user','group');
+        }else{
+            $group = Group::find($id);
+            return response()->json(collect($group));
+        }
+
 
         return response()->json(collect($chat)->reverse());
     }

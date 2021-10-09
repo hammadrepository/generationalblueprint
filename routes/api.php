@@ -35,14 +35,17 @@ Route::namespace('API')->group(function () {
         Route::post('/questions','QuestionController@storeQuestionAnswer');
 
     });
+
     Route::get('user/{id}','UserController@show');
     Route::get('/deleteToken/{email}','UserController@deleteToken');
-    Route::post('/testResponse',function(Request $request){
-        return response()->json($request->all());
-    });
+
+    Route::post('conversations','ConversationController@store');
     Route::post('/contact','ContactController@contactUs');
 });
-Route::post('conversations','ConversationController@store');
+Route::get('/chat/{id}', 'HomeController@loadChat')->name('chat');
+Route::post('/banUser', 'API\UserController@banUser')->name('banUser');
+
+
 Route::apiResource('conversations', 'API\ConversationController');
 
 Route::apiResources(['user' => 'API\UserController']);

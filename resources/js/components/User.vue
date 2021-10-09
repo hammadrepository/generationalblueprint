@@ -31,9 +31,9 @@
                             <td><span class="tag tag-success">{{user.phone | capitalize}}</span></td>
                             <td><span class="tag tag-success">{{user.created_at | mydate}}</span></td>
                             <td>
-                                <button @click="changeSignature(user)" class="btn btn-primary">Change eSignature</button>
-                                <button @click="emailSignature(user)" class="btn btn-success">Email <div v-bind:id="'spinner' +user.id" class="spinner-border spinner-border-sm  d-none" role="status">
-                                </div></button>
+<!--                                <button @click="changeSignature(user)" class="btn btn-primary">Change eSignature</button>-->
+<!--                                <button @click="emailSignature(user)" class="btn btn-success">Email <div v-bind:id="'spinner' +user.id" class="spinner-border spinner-border-sm  d-none" role="status">-->
+<!--                                </div></button>-->
                                <button @click="editModal(user)" class="btn btn-primary">Edit</button>
                                <button @click="deleteUser(user.id)" class="btn btn-danger">Delete</button>
                             </td>

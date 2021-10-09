@@ -23,6 +23,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
+    <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
+
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -188,6 +190,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <!-- jQuery -->
 <script src="{{asset('js/app.js')}}"></script>
+
+<script>
+    const beamsClient = new PusherPushNotifications.Client({
+        instanceId: 'bd0c974b-3f24-4d60-9a4e-8c5b42d20523',
+    });
+
+    beamsClient.start()
+        .then(() => beamsClient.addDeviceInterest('hello'))
+        .then(() => console.log('Successfully registered and subscribed!'))
+        .catch(console.error);
+</script>
 {{--<script src="{{asset('js/app2.js')}}"></script>--}}
 </body>
 </html>

@@ -159,7 +159,13 @@ class UserController extends Controller
         $user->update($request->all());
         return ['message' => 'updated'];
     }
+    public function banUser(Request $request) {
+        $user = User::find($request->id);
+        $user->update(['status'=> $request->status]);
+        event(new \App\Events\UserBan($user));
+        return response()->json(['success' => true],200);
 
+    }
     public function returnImage($id) {
         $file =\App\EmailSignature::whereUserId($id)->first();
         $headers = array(
