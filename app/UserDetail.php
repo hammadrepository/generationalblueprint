@@ -10,5 +10,5 @@ class UserDetail extends Model
 
     protected $table = 'user_detail';
 
-    protected $fillable = ['user_id','avatar','race','nationality'];
+    protected $fillable = ['user_id','avatar','race','age_group','nationality'];
 }

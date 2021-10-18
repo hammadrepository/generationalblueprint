@@ -34,12 +34,12 @@ class ConversationController extends Controller
     {
 
         $request->validate([
-            'file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048'
+            'file' => 'required|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048'
         ]);
 
         if($request->file()) {
-            $file_name = time().'_'.$request->file->getClientOriginalName();
-            $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
+            $file_name = request('group_id').time().'_'.$request->file->getClientOriginalName();
+            $file_path = $request->file('file')->storeAs('uploads/chat/'.auth()->id().time() .'/', $file_name, 'public');
 
             try{
                 $conversation = Conversation::create([

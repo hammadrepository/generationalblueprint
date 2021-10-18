@@ -10,7 +10,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>E-Signature</title>
+    <title>Generational Blueprint</title>
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -85,7 +85,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="index3.html" class="brand-link">
-            <span class="brand-text font-weight-light">E-Signature</span>
+            <span class="brand-text font-weight-light">Generational Blueprint</span>
         </a>
 
         <!-- Sidebar -->
@@ -96,7 +96,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">{{Auth::user()->name}}</a>
+                    <a href="#" class="d-block text-capitalize">{{Auth::user()->name}}</a>
                 </div>
             </div>
 
@@ -116,21 +116,29 @@ scratch. This page gets rid of all links and provides the needed markup only.
 {{--                    </li>--}}
                     <li class="nav-item has-treeview ">
                         <router-link to="/user" class="nav-link ">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Employees</p>
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Users</p>
                         </router-link>
                     </li>
                     <li class="nav-item">
                         <router-link to="/profile" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-user"></i>
                             <p>
                                 My Profile
                             </p>
                         </router-link>
                     </li>
                     <li class="nav-item">
+                        <router-link to="/live-session" class="nav-link">
+                            <i class="nav-icon far fa-record-vinyl"></i>
+                            <p>
+                                Live Sessions
+                            </p>
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
                         <router-link to="/chat" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon far fa-comment"></i>
                             <p>
                                 Chat
                             </p>
@@ -140,7 +148,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <a  class="nav-link" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
                             <p>
                                 Logout
                             </p>
@@ -189,7 +197,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- REQUIRED SCRIPTS -->
 
 <!-- jQuery -->
-<script src="{{asset('js/app.js')}}"></script>
+{{--<script src="{{asset('js/app.js')}}"></script>--}}
 
 <script>
     const beamsClient = new PusherPushNotifications.Client({

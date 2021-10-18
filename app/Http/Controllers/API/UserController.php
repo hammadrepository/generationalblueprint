@@ -82,12 +82,14 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+
+        $this->validate($request,[
             'email' => 'required|email',
             'password' => 'required',
             'fcm_token' => 'nullable',
             'device_name' => 'required',
         ]);
+
         try{
             $user = \App\User::where('email', $request->email)->first();
             if(isset($user) && $user->tokens()->count() >= 2){
@@ -107,15 +109,16 @@ class UserController extends Controller
             $response = [
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'group' => $user->category()->latest()->first()->category ?? null,
-                'questions_completed'=> $user->checkCategory()
+                'group' => $user->groups()->first() ?? null,
+                'questions_completed'=> $user->checkCategory(),
+                'user' => $user
             ];
 
             $message = 'User logged in successfully!';
             return $this->sendResponse($response,$message);
         }catch (\Exception $e){
 
-            return $this->sendError($e->getMessage(),$e->getMessage(),400);
+            return $this->sendError($e->getMessage(),$e,400);
         }
     }
 
@@ -128,6 +131,7 @@ class UserController extends Controller
             'password' => 'required',
             'fcm_token' => 'nullable',
             'race' => 'nullable',
+            'age_group' => 'nullable',
             'nationality' => 'nullable',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
         ]);
@@ -139,15 +143,36 @@ class UserController extends Controller
             DB::beginTransaction();
             $createdUser = $user->createUser($validatedData);
             DB::commit();
+
+            // Create token
             $token = $createdUser->createToken('auth_token')->plainTextToken;
+
+            // Send Otp
+            $createdUser->otpMethod = $request->otpMethod ?? '';
+            $otp = $user->sendOtp($createdUser);
 
             $response = [
                 'access_token' => $token,
                 'token_type' => 'Bearer',
+                'otp' => $createdUser->otp
             ];
             $message = 'User created successfully!';
             return $this->sendResponse($response,$message);
 
+        }catch (\Exception $e){
+            return $this->sendError($e->getMessage(),[],400);
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        try{
+            if($user = auth('sanctum')->user()){
+                $user->currentAccessToken()->delete();
+                $message = 'User logged out successfully!';
+                return $this->sendResponse([],$message);
+            }
+            return $this->sendError('User is not logged in!',[],400);
         }catch (\Exception $e){
             return $this->sendError($e->getMessage(),[],400);
         }

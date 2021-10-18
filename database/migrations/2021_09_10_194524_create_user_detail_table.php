@@ -19,6 +19,7 @@ class CreateUserDetailTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('avatar')->nullable();
             $table->string('race')->nullable();
+            $table->string('age_group')->nullable();
             $table->string('nationality')->nullable();
             $table->timestamps();
         });

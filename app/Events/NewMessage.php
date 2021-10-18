@@ -17,6 +17,9 @@ class NewMessage implements ShouldBroadcast
 
     public $conversation;
 
+
+
+
     /**
      * Create a new event instance.
      *
@@ -25,6 +28,7 @@ class NewMessage implements ShouldBroadcast
     public function __construct(Conversation $conversation)
     {
         $this->conversation = $conversation;
+
 
     }
 
@@ -45,6 +49,7 @@ class NewMessage implements ShouldBroadcast
     {
         return [
             'group' => $this->conversation->group,
+
             'type' => $this->conversation->type ?? '',
             'message' => $this->conversation->message,
             'created_at' => date_format($this->conversation->created_at,"Y-m-d H:i"),

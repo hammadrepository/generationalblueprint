@@ -11,7 +11,7 @@
                         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-3 col-3">
                             <div class="users-container bg-light">
                                 <ul class="users">
-                                    <li v-for="group1 in groups"   :data-chat="'group' + group.id" @click="loadChat(group1.id)">
+                                    <li v-for="group1 in groups"   :data-chat="'group' + group1.id" @click="loadChat(group1.id)">
                                         <div :class="{highlight:selected == group1.id}" class="person">
                                         <div class="user">
                                             <img alt="Retail Admin" src="https://www.bootdey.com/img/Content/avatar/avatar3.png">
@@ -61,9 +61,9 @@
                                         <div v-show="getClass(conversation.user.id) != 'chat-right'" class="chat-hour">{{ conversation.created_at.split(' ')[1]}} <span class="fa fa-check-circle"></span></div>
                                     </li>
                                 </ul>
-                                <div v-show="this.user1.status" class="form-group mt-3 mb-0">
+                                <div v-if="this.user1.status" class="form-group mt-3 mb-0">
                                     <div class="input-group">
-                                        <input id="btn-input" v-model="message" @keyup="keyPressed($event.target.value)" autofocus class="form-control input-sm" placeholder="Type your message here..." type="text" @keyup.enter="store()" />
+                                        <input id="btn-input " v-model="message" @keyup="keyPressed($event.target.value)" autofocus class="form-control input-sm" placeholder="Type your message here..." type="text" @keyup.enter="store()" />
 
                                         <div class='file file--upload'>
                                             <label for='input-file'>
@@ -77,7 +77,7 @@
                                 </span>
                                     </div>
                                 </div>
-                                <div v-show="!this.user1.status" class="form-group mt-3 mb-0">
+                                <div v-if="!this.user1.status" class="form-group mt-3 mb-0">
                                     <p class="text-danger text-center font-weight-bold"> You are banned from this group! </p>
                                 </div>
 
@@ -120,12 +120,6 @@
                                 <has-error :form="form" field="phone"></has-error>
                             </div>
 
-                            <div class="form-group">
-                                <label>Password</label>
-                                <input v-model="form.password" readonly type="password" name="password"
-                                       class="form-control" :class="{ 'is-invalid': form.errors.has('password') }">
-                                <has-error :form="form" field="password"></has-error>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -180,7 +174,7 @@
             this.groups = this.allgroups;
             this.currentGroup = this.groups[0];
             this.loadChat(this.allgroups[0].id);
-            this.listenForNewMessage();
+            // this.listenForNewMessage();
         },
         // watch: {
         //     loader () {
@@ -213,7 +207,10 @@
                 return 'chat-left';
             },
             store() {
-
+                if (!this.message.trim().length) {
+                    this.isDisabled = true;
+                    return;
+                }
                 this.loading = true;
                 let config = {
                     headers: {
@@ -238,7 +235,7 @@
 
             },
             keyPressed(e){
-                if(e.length > 0){
+                if(e.length > 0 && this.message.trim().length){
                     this.isDisabled = false;
                 }else{
                 this.isDisabled = true;
@@ -305,6 +302,7 @@
               .then((response) => {
                   if(response['data']['data']){
                   Echo.leaveChannel('private-groups.'+this.currentGroup.id);
+                      Echo.leaveChannel('private-user.ban.'+this.user1.id);
                  this.conversations = (response.data.data.reverse());
                  this.next_page_url = response.data.next_page_url;
                  this.next_page_url != null ? this.hasMore = true: this.hasMore = false;
@@ -313,6 +311,10 @@
                   this.listenForNewMessage();
                   this.isLoading = false;
                   this.selected = id;
+                  setTimeout(()=>{
+                      this.scrollToEnd();
+                  },300);
+
                   }else{
                       Echo.leaveChannel('private-groups.'+this.currentGroup.id);
                       this.conversations = {};
@@ -372,10 +374,7 @@
 
                 Echo.private('user.ban.' + this.user1.id)
                     .listen('UserBan', (e) => {
-                        // toast.fire({
-                        //     type: 'success',
-                        //     title: e.message
-                        // });
+                        console.log('Ban!');
                         this.user1.status = this.user1.status == 1 ? 0 : 1  ;
                     });
 

@@ -6,7 +6,7 @@
         </div>
         <p class="name-time">
             <span class="name">{{ singleGroup.name }}</span>
-            <span class="time">15/02/2019</span>
+            <span class="time pull-right">15/02/2019</span>
         </p>
     </li>
 </template>

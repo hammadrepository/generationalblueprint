@@ -5,10 +5,24 @@ window.Vue = require('vue');
 import VueRouter from 'vue-router'
 Vue.use(VueRouter);
 
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+// Import Bootstrap an BootstrapVue CSS files (order is important)
+// import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+// Make BootstrapVue available throughout your project
+Vue.use(BootstrapVue)
+
 import Vuetify from 'vuetify'
 
 Vue.use(Vuetify);
 import 'vuetify/dist/vuetify.min.css'
+
+import uploader from 'vue-simple-uploader'
+
+Vue.use(uploader)
+
 //vform
 import { Form, HasError, AlertError } from 'vform'
 window.Form = Form;
@@ -50,6 +64,7 @@ let routes = [
     { path: '/groups', component: require('./components/Groups.vue').default },
     { path: '/create-group', component: require('./components/CreateGroup.vue').default },
     { path: '/group-chat', component: require('./components/GroupChat.vue').default },
+    { path: '/live-session', component: require('./components/live_session.vue').default },
 ];
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
@@ -66,8 +81,12 @@ const router = new VueRouter({
 
 
 Vue.filter('mydate',function (created) {
-   return moment(created).format('MMM Do YY');
+   return moment(created).format('MMM Do, YYYY');
 });
+Vue.filter('time',function (created) {
+   return moment(created, ["HH.mm"]).format("hh:mm a");
+});
+
 
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
@@ -80,11 +99,19 @@ Vue.use(Toast, options);
 
 Vue.prototype.$userId = document.querySelector("meta[name='user_id']").getAttribute('content');
 
+axios.get('/groupsList')
+    .then((response) =>
+        {
+            Vue.prototype.$groups  =  response.data.groups.map(a => a.id);
+        }
+    );
+
+console.log(Vue.prototype.$groups);
 Echo.private('groups')
     .listen('NewMessage', (e) => {
 
-        if(Vue.prototype.$userId != e.user.id){
-        var message = e.type == "media" ? "File Received" :e.message;
+        if(Vue.prototype.$userId != e.user.id && Vue.prototype.$groups.includes(e.group.id)){
+        var message = e.type == "media" ? "File Received" : e.message;
         var title = `${e.group.name}`;
         Vue.$toast(title + '\n' + e.user.name +': ' + message , {
             position: "bottom-left",

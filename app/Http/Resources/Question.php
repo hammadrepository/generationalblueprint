@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\QuestionOption as QuestionResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Cache;
 
 class Question extends JsonResource
 {
@@ -20,7 +21,8 @@ class Question extends JsonResource
         return [
             'id' => $this->id,
             'question' => $this->question,
-            'options' => QuestionResource::collection($this->options)
+            'options' =>  QuestionResource::collection($this->options)
+
         ];
     }
 }

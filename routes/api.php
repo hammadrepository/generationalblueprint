@@ -4,6 +4,7 @@ use App\Conversation;
 use App\Events\NewMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,11 +20,20 @@ use Illuminate\Support\Facades\Broadcast;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+header("Access-Control-Allow-Origin: *");
+
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+
+header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers");
+header("Access-Control-Allow-Credentials: true");
+
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 //Route::post('/broadcast',function (Request $request) {
 //    $pusher = new Pusher\Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'));
 //    return $pusher->socket_auth('private-groups.1', $request->request->get('socket_id'));
 //});
+
+
 Route::namespace('API')->group(function () {
     Route::post('/register', 'UserController@register');
     Route::post('/login', 'UserController@login');
@@ -42,10 +52,17 @@ Route::namespace('API')->group(function () {
     Route::post('conversations','ConversationController@store');
     Route::post('/contact','ContactController@contactUs');
 });
-Route::get('/chat/{id}', 'HomeController@loadChat')->name('chat');
+Route::get('/conversation/history/{id}', 'HomeController@loadChat')->name('conversation.history');
 Route::post('/banUser', 'API\UserController@banUser')->name('banUser');
 
+Route::post('/session/create', 'API\LiveSessionController@create');
+Route::get('/sessions', 'API\LiveSessionController@index');
+Route::get('/sessions/users', 'API\LiveSessionController@userSessions');
+Route::post('/session/update', 'API\LiveSessionController@update')->name('session.update');
+Route::get('/session/destroy/{id}', 'API\LiveSessionController@destroy')->name('session.delete');
+Route::get('/session/groups', 'API\LiveSessionController@getAllGroups');
 
+Route::post('conversation/sendFile','API\ConversationController@sendFile');
 Route::apiResource('conversations', 'API\ConversationController');
 
 Route::apiResources(['user' => 'API\UserController']);

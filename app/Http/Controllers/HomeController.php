@@ -65,6 +65,7 @@ class HomeController extends Controller
 
     public function loadChat($id)
     {
+
         $chat = Conversation::where('group_id',$id)->orderBy('id', 'DESC')->orderBy('created_at', 'DESC')->paginate(10);
 
         if(count($chat) > 0){

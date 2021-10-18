@@ -310,6 +310,9 @@ file {
     font-weight: 400;
     font-size: .7rem;
     text-align: right;
+    position: absolute;
+    right: 10px;
+    float: right;
     color: #8796af;
 }
 
@@ -365,7 +368,7 @@ file {
     display: flex;
     flex: 1;
     flex-direction: row;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
 
 .chat-container li img {
