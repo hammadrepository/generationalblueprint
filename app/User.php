@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\Controller;
 use App\Mail\OtpSend;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
+use Twilio\Rest\Client;
 
 class User extends Authenticatable
 {
@@ -26,6 +28,7 @@ class User extends Authenticatable
         'phone',
         'status',
         'otp',
+        'otp_verified',
         'fcm_token  ',
         'password',
     ];
@@ -76,26 +79,26 @@ class User extends Authenticatable
     public function createOtp($user)
     {
         $data['otp'] = mt_rand(1000, 9999);
-        $data['otp_valid_till'] = date('Y-m-d H:i:s', strtotime("+3 minutes"));
-        return $user->update(['otp' => $data['otp']]);
+
+//        $data['otp_valid_till'] = date('Y-m-d H:i:s', strtotime("+3 minutes"));
+        return $user->update(['otp' => $data['otp'], 'otp_verified' => false]);
     }
 
     public function sendOtp(User $user)
     {
         if($user->otpMethod == 'email'){
-            return $this->sendOtpEmail($user->otp,$user->email);
+            return $this->sendOtpEmail($user);
         }else{
-//            return $this->sendOtpSms();
+            return $this->sendOtpSms($user->otp, $user->phone);
         }
     }
 
-    public function sendOtpEmail(string $otp, string $recipient)
+    public function sendOtpEmail(User $user)
     {
         $res = true;
-        $data['otp'] = $otp;
-        Mail::to($recipient)->send(new OtpSend($otp));
         try {
-
+            Mail::to($user->email)->send(new OtpSend($user));
+            return response()->json(['success'=> true, 'message' => 'Email sent successfully!', 'data' => []]);
         } catch (\Exception $e) {
 
             $res = false;
@@ -105,6 +108,13 @@ class User extends Authenticatable
 
     public function sendOtpSms(string $otp, string $recipient)
     {
+        $account_sid = getenv("TWILIO_SID");
+        $auth_token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_number = '+15405017641';
+        $client = new Client($account_sid,$auth_token);
+//    $client = new Client($account_sid, $auth_token);
+       return $client->messages->create($recipient,
+            ['from' => '+15405017641', 'body' => 'Your OTP is {$otp}'] );
 
     }
 

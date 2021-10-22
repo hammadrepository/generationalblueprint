@@ -65,6 +65,7 @@ let routes = [
     { path: '/create-group', component: require('./components/CreateGroup.vue').default },
     { path: '/group-chat', component: require('./components/GroupChat.vue').default },
     { path: '/live-session', component: require('./components/live_session.vue').default },
+    { path: '/documents-upload', component: require('./components/DocumentUpload.vue').default },
 ];
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);

@@ -16,6 +16,7 @@ class Category extends JsonResource
     public function toArray($request)
     {
         return [
+            "id" => isset($this->id) ? $this->id : '',
             "name" => isset($this->name) ? $this->name : '',
             "avatar" => isset($this->avatar) ? $this->avatar :'',
             "unique_id" => isset($this->unique_id) ? $this->unique_id :  '',

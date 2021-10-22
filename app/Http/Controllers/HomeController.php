@@ -7,6 +7,7 @@ use App\Group;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Exception;
 
 class HomeController extends Controller
 {
@@ -65,19 +66,25 @@ class HomeController extends Controller
 
     public function loadChat($id)
     {
-
+        try{
         $chat = Conversation::where('group_id',$id)->orderBy('id', 'DESC')->orderBy('created_at', 'DESC')->paginate(10);
-
+        $ban =  collect(['user_ban' => !auth('sanctum')->user()->status]);
         if(count($chat) > 0){
-//            $chat->paginate(10);
+
             $chat->load('user','group');
+//            dd(auth('sanctum')->user()->status);
+
         }else{
             $group = Group::find($id);
-            return response()->json(collect($group));
+            return response()->json(collect($group)->merge($ban));
         }
 
 
-        return response()->json(collect($chat)->reverse());
+        return response()->json(collect($chat)->reverse()->merge($ban));
+
+        }catch(Exception $e){
+            return $this->sendError($e->getMessage(),$e,400);
+        }
     }
     public function currentUser()
     {

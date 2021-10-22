@@ -31,7 +31,7 @@ class ConversationController extends Controller
 
     public function sendFile(Request $request)
     {
-dd($request->all());
+
         $request->validate([
             'file' => 'required|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048'
         ]);

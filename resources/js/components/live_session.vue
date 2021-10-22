@@ -44,16 +44,7 @@
             <!-- /.card -->
         </div>
 
-        <uploader :options="options" class="uploader-example">
-            <uploader-unsupport></uploader-unsupport>
-            <uploader-drop>
-                <p>Drop files here to upload or</p>
-                <uploader-btn>select files</uploader-btn>
-                <uploader-btn :attrs="attrs">select images</uploader-btn>
-                <uploader-btn :directory="true">select folder</uploader-btn>
-            </uploader-drop>
-            <uploader-list></uploader-list>
-        </uploader>
+
 
         <!-- Modal -->
         <div class="modal fade" id="addNew" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -141,11 +132,7 @@ export default {
             selected: 'Immigrant',
             input: '',
             sessions : {},
-            groups: {
-                // 1: {id: 1, val: 'item1'},
-                // 2: {id: 2, val: 'item2'},
-                // 3: {id: 3, val: 'item3'},
-            },
+            groups: {},
             options: {
                 // https://github.com/simple-uploader/Uploader/tree/develop/samples/Node.js
                 target: '//127.0.0.1:8000/api/conversation/sendFile',

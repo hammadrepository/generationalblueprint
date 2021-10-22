@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use  App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
+use Twilio\Rest\Client;
 
 class UserController extends Controller
 {
@@ -92,8 +93,13 @@ class UserController extends Controller
 
         try{
             $user = \App\User::where('email', $request->email)->first();
-            if(isset($user) && $user->tokens()->count() >= 2){
-                return $this->sendError('You cannot log in more than 2 devices!',[],200);
+            if(isset($user) && $user->tokens()->count() >= 2 ){
+                if($user->otp_verified != 1){
+                    $user->tokens()->delete();
+                }else{
+                    return $this->sendError('You cannot log in more than 2 devices!',[],200);
+                }
+
             }
             if (! $user || ! Hash::check($request->password, $user->password)) {
                 throw ValidationException::withMessages([
@@ -116,8 +122,10 @@ class UserController extends Controller
 
             $message = 'User logged in successfully!';
             return $this->sendResponse($response,$message);
-        }catch (\Exception $e){
-
+        }catch (ValidationException $exception){
+            return $this->sendError($exception->getMessage(),$exception,422);
+        }
+        catch (\Exception $e){
             return $this->sendError($e->getMessage(),$e,400);
         }
     }
@@ -154,13 +162,14 @@ class UserController extends Controller
             $response = [
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'otp' => $createdUser->otp
+                'otp' => $createdUser->otp,
+                'user' => $createdUser
             ];
             $message = 'User created successfully!';
             return $this->sendResponse($response,$message);
 
         }catch (\Exception $e){
-            return $this->sendError($e->getMessage(),[],400);
+            return $this->sendError($e->getMessage(),[],200);
         }
     }
 
@@ -177,6 +186,39 @@ class UserController extends Controller
             return $this->sendError($e->getMessage(),[],400);
         }
     }
+
+    public function verifyOtp(Request $request)
+    {
+        $this->validate($request,
+        [
+            'otp_verified' => 'required|boolean'
+        ]);
+        try{
+            $user = User::find(auth('sanctum')->id());
+            $user->update([ 'otp_verified'=> 1 ]);
+            $message = 'OTP verified successfully';
+            return $this->sendResponse($response = [],$message);
+        }catch (\Exception $e){
+            return $this->sendError($e->getMessage(),[],400);
+        }
+
+    }
+
+    public function resendOtp(Request $request)
+    {
+        try{
+            $user = auth('sanctum')->user();
+            $userObj = new User();
+            $userObj->createOtp($user);
+            $user->otpMethod = $request->otpMethod ?? '';
+            $user->sendOtp($user);
+
+            return $this->sendResponse(['otp' => $user->otp], $message = 'Otp sent successfully');
+        }catch (\Exception $e){
+            return $this->sendError($e->getMessage(),$e,200);
+        }
+        }
+
 
     public function profile_update(Request $request,$id)
     {
