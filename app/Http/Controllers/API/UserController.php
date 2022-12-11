@@ -253,9 +253,6 @@ class UserController extends Controller
         if($request->file()) {
             $file_name = time().'_'.$request->file->getClientOriginalName();
             $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
-//            $fileUpload->user_id = $request->user_id;
-//            $fileUpload->name = time().'_'.$request->file->getClientOriginalName();
-//            $fileUpload->image = '/storage/' . $file_path;
             EmailSignature::updateOrCreate([
                 'user_id' => $request->user_id
             ],[
@@ -264,8 +261,6 @@ class UserController extends Controller
                 'image' => '/storage/' . $file_path,
                 'imageLink' => url('/') . '/imagefile/'.$request->user_id
             ]);
-//            $fileUpload->save();
-
             return response()->json(['success'=>'File uploaded successfully.']);
         }
     }
