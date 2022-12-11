@@ -71,15 +71,6 @@ Route::delete('document/{id}', 'API\DocumentController@destroy');
 Route::apiResource('conversations', 'API\ConversationController');
 Route::post('/otp/verify','API\UserController@verifyOtp')->name('otp.verify');
 Route::post('/otp/resend','API\UserController@resendOtp')->name('otp.resend');
-Route::get('/testClient',function (){
-    $account_sid = getenv("TWILIO_SID");
-    $auth_token = getenv("TWILIO_AUTH_TOKEN");
-    $twilio_number = '+12152686931';
-    $client = new Client($account_sid,$auth_token);
-//    $client = new Client($account_sid, $auth_token);
-    $client->messages->create('+18623397010',
-        ['from' => '+15405017641', 'body' => 'Han be kallu. Kaisa dia?'] );
-});
 Route::apiResources(['user' => 'API\UserController']);
 
 Route::get('/profile','API\UserController@current_user');
