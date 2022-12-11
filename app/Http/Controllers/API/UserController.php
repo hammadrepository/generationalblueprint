@@ -26,7 +26,6 @@ class UserController extends Controller
 
     public function __construct()
     {
-//        $this->middleware('api');
     }
 
     public function index()
@@ -66,20 +65,10 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-//        $user->load('detail');
        $user->isAdmin =  auth()->id() == 1 ? true : false;
         return response()->json(['user' => $user]);
     }
 
-
-
-    public function current_user()
-    {
-        $user = \auth()->user();
-        $user = new HomeController();
-        dd($user->currentUser());
-;       return response()->json(['message'=>$user]);
-    }
 
     public function login(Request $request)
     {
@@ -143,9 +132,6 @@ class UserController extends Controller
             'nationality' => 'nullable',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
         ]);
-//             $path = $request->file('avatar')->storeAs(
-//                'avatars', 'user_'.$validatedData['phone'].'.'.$request->avatar->getClientOriginalExtension()
-//            );
         try{
             $user = new User;
             DB::beginTransaction();
@@ -306,7 +292,6 @@ class UserController extends Controller
     public function deleteToken($email)
     {
         $user  = User::where('email',$email)->first();
-//        dd($user);
         $user->tokens()->delete();
         return response()->json(['success'=> true]);
     }
