@@ -110,11 +110,10 @@ class User extends Authenticatable
     {
         $account_sid = getenv("TWILIO_SID");
         $auth_token = getenv("TWILIO_AUTH_TOKEN");
-        $twilio_number = '+15405017641';
+        $twilio_number = '+12222222';
         $client = new Client($account_sid,$auth_token);
-//    $client = new Client($account_sid, $auth_token);
        return $client->messages->create($recipient,
-            ['from' => '+15405017641', 'body' => 'Your OTP is {$otp}'] );
+            ['from' => '+13333333', 'body' => 'Your OTP is {$otp}'] );
 
     }
 

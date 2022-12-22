@@ -17,20 +17,21 @@ Route::get('/', function () {
 Route::get('/storage/',function (){})->name('storage');
 
 Auth::routes();
-Route::group(['middleware' => 'auth'],function(){
+Route::group(['middleware' => 'auth'], function() {
 
     Route::resource('groups', 'GroupController');
     Route::resource('conversations', 'ConversationController');
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/home', 'HomeController@index')->name('home');
+
     Route::get('/chat', 'HomeController@chat')->name('chat');
-    Route::get('/chat/{id}', 'HomeController@loadChat')->name('chat');
-    Route::get('/groupsList', 'HomeController@groupsList')->name('groupsList');
+    Route::get('/chat/{id}', 'API\ConversationController@loadChat')->name('conversation.history');
+    Route::get('/groupsList', 'API\ConversationController@groupsList')->name('groupsList');
+
     Route::get('/imagefile/{id}','API\UserController@returnImage');
     Route::post('/upload', 'ConversationController@sendFile')->name('upload');
     //Route::post('/upload', 'API\UserController@imageUpload')->name('upload');
     Route::get('/emailToUser/{id}', 'API\UserController@emailToUser')->name('emailToUser');
-    //Route::get('{path}','HomeController@index')->where('path','([A-z\d-\/_.]+)?');
 
 });
 

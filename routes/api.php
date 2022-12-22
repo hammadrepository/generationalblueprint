@@ -53,7 +53,7 @@ Route::namespace('API')->group(function () {
     Route::post('conversations','ConversationController@store');
     Route::post('/contact','ContactController@contactUs');
 });
-Route::get('/conversation/history/{id}', 'HomeController@loadChat')->name('conversation.history');
+Route::get('/conversation/history/{id}', 'API\ConversationController@loadChat')->name('conversation.history');
 Route::post('/banUser', 'API\UserController@banUser')->name('banUser');
 
 Route::post('/session/create', 'API\LiveSessionController@create');
