@@ -21,12 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-header("Access-Control-Allow-Origin: *");
 
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers");
-header("Access-Control-Allow-Credentials: true");
 
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 //Route::post('/broadcast',function (Request $request) {
@@ -41,10 +36,8 @@ Route::namespace('API')->group(function () {
     Route::post('/logout', 'UserController@logout');
 
     Route::middleware('auth:sanctum')->group(function (){
-
         Route::get('/questions','QuestionController@index');
         Route::post('/questions','QuestionController@storeQuestionAnswer');
-
     });
 
     Route::get('user/{id}','UserController@show');
