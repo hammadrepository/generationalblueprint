@@ -2,11 +2,9 @@
 
 ## About Generational Blueprint
 
-This project will connect people with similar interests. It allows people to chat with people having same interests along with audio and file sharing options. Admin can create live sessions for particular group and all those users will be notified once the session is created. Also, there is a library for each group, where they can find documents related to their interests. 
+This project aims to connect individuals with shared interests through a chat platform that offers audio and file sharing capabilities. With the ability to create live sessions, users can easily connect with others and stay informed about new opportunities within their community. Additionally, this platform includes a library feature, where users can access and share relevant documents related to their interests.
 
-This is only the backend of the application. It contains REST APIs for for mobile application and admin panel for user management.
-
-PS: This is just a prototype. 
+This project encompasses the backend development of the application, including the creation of REST APIs for both the mobile application and the user management admin panel. As a prototype, this project serves as a foundation for future expansion and improvements.
 
 
 ## Technologies
